@@ -82,7 +82,7 @@ numPlots = 1
 sizes = []
 
 def addplot(numPlots):
-    newPlot = st.checkbox("Plot " + numPlots, False)
+    newPlot = st.checkbox("Plot " + str(numPlots), False)
     if (newPlot):
         funcs = []
         plotName = st.selectbox("Default or Custom Plot", ["MergeSorts", "HeapSorts", "SimpleSorts", "BestComparison", "QuadraticComparison", "Custom"])
