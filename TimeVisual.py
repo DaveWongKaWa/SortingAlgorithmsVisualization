@@ -62,7 +62,7 @@ FuncMap = dict({
     "OBUMergeSort":OrdinaryBottomUpMergeSort,
     "ATDMergeSort":AltTopDownMergeSort,
     "ABUMergeSort":AltBottomUpMergeSort,
-    "ITPMergeSort":InplaceTopDownMergeSort,
+    "ITDMergeSort":InplaceTopDownMergeSort,
     "IBUMergeSort":InplaceBottomUpMergeSort,
     "OTDHeapSort":OrdinaryTopDownHeapSort,
     "OBUHeapSort":OrdinaryBottomUpHeapSort,
