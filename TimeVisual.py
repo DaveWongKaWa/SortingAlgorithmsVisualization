@@ -107,7 +107,7 @@ def addplot(numPlots):
 
 def plot(Functions, sampleSizes, depth):
     ax = fig.add_subplot(3, 3, numPlots)
-    ax.set_title("Plot " + numPlots)
+    ax.set_title("Plot " + str(numPlots))
     for func in Functions:
         times = SortingAlgorithms_Times(FuncMap[func], sampleSizes, depth)
         sns.lineplot(x = sampleSizes, y = times, linewidth=0.25, label=func)
