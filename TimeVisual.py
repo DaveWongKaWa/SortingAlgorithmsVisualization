@@ -85,7 +85,7 @@ def addplot(numPlots):
     newPlot = st.checkbox("Plot " + str(numPlots), False)
     if (newPlot):
         funcs = []
-        plotName = st.selectbox("Default or Custom Plot", ["MergeSorts", "HeapSorts", "SimpleSorts", "BestComparison", "QuadraticComparison", "Custom"])
+        plotName = st.selectbox("Default or Custom Plot", ["MergeSorts", "HeapSorts", "SimpleSorts", "BestComparison", "QuadraticComparison", "Custom"], key=str(numPlots))
         if (plotName == "MergeSorts"):
             funcs = MergeSorts
         elif (plotName == "HeapSorts"):
@@ -98,9 +98,9 @@ def addplot(numPlots):
             funcs = QuadraticComparison
         elif (plotName == "Custom"):
             funcs = st.multiselect("Algorithms", Algorithms)
-        sampleSizeUpperBound = st.slider("Sample Sizes", min_value = 10, max_value = 1000)
+        sampleSizeUpperBound = st.slider("Sample Sizes", min_value = 10, max_value = 1000, key=str(numPlots))
         sizes = range(1, sampleSizeUpperBound+1)
-        depth = st.slider("Execution Depth", min_value = 1, max_value = 5)
+        depth = st.slider("Execution Depth", min_value = 1, max_value = 5, key=str(numPlots))
         plot(funcs, sizes, depth)
         numPlots += 1
         addplot(numPlots)
@@ -111,6 +111,8 @@ def plot(Functions, sampleSizes, depth):
     for func in Functions:
         times = SortingAlgorithms_Times(FuncMap[func], sampleSizes, depth)
         sns.lineplot(x = sampleSizes, y = times, linewidth=0.25, label=func)
+    plt.show()
 
 fig = plt.figure(figsize = (10, 9), dpi=500, tight_layout = True)
+plt.show()
 addplot(numPlots)
