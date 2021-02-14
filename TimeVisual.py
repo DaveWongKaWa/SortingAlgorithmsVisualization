@@ -113,3 +113,4 @@ def plot(Functions, sampleSizes, depth):
         sns.lineplot(x = sampleSizes, y = times, linewidth=0.25, label=func)
 
 fig = plt.figure(figsize = (10, 9), dpi=500, tight_layout = True)
+addplot(numPlots)
