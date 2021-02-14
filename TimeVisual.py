@@ -58,7 +58,7 @@ Algorithms.append("SelectionSort")
 
 FuncMap = dict({
     "QuickSort":QuickSort,
-    "OTDmergeSort":OrdinaryTopDownMergeSort,
+    "OTDMergeSort":OrdinaryTopDownMergeSort,
     "OBUMergeSort":OrdinaryBottomUpMergeSort,
     "ATDMergeSort":AltTopDownMergeSort,
     "ABUMergeSort":AltBottomUpMergeSort,
