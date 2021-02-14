@@ -27,19 +27,19 @@ import seaborn as sns
 sns.set_theme(context="paper", style="darkgrid")
 import streamlit as st
 
-from SortingAlgorithmsVisualization.SortingAlgorithm import QuickSort
-from SortingAlgorithmsVisualization.SortingAlgorithm import OrdinaryTopDownMergeSort
-from SortingAlgorithmsVisualization.SortingAlgorithm import OrdinaryBottomUpMergeSort
-from SortingAlgorithmsVisualization.SortingAlgorithm import AltTopDownMergeSort
-from SortingAlgorithmsVisualization.SortingAlgorithm import AltBottomUpMergeSort
-from SortingAlgorithmsVisualization.SortingAlgorithm import InplaceTopDownMergeSort
-from SortingAlgorithmsVisualization.SortingAlgorithm import InplaceBottomUpMergeSort
-from SortingAlgorithmsVisualization.SortingAlgorithm import OrdinaryTopDownHeapSort
-from SortingAlgorithmsVisualization.SortingAlgorithm import OrdinaryBottomUpHeapSort
-from SortingAlgorithmsVisualization.SortingAlgorithm import TernaryTopDownHeapSort
-from SortingAlgorithmsVisualization.SortingAlgorithm import TernaryBottomUpHeapSort
-from SortingAlgorithmsVisualization.SortingAlgorithm import InsertionSort
-from SortingAlgorithmsVisualization.SortingAlgorithm import SelectionSort
+from SortingAlgorithm import QuickSort
+from SortingAlgorithm import OrdinaryTopDownMergeSort
+from SortingAlgorithm import OrdinaryBottomUpMergeSort
+from SortingAlgorithm import AltTopDownMergeSort
+from SortingAlgorithm import AltBottomUpMergeSort
+from SortingAlgorithm import InplaceTopDownMergeSort
+from SortingAlgorithm import InplaceBottomUpMergeSort
+from SortingAlgorithm import OrdinaryTopDownHeapSort
+from SortingAlgorithm import OrdinaryBottomUpHeapSort
+from SortingAlgorithm import TernaryTopDownHeapSort
+from SortingAlgorithm import TernaryBottomUpHeapSort
+from SortingAlgorithm import InsertionSort
+from SortingAlgorithm import SelectionSort
 
 Algorithms = []
 Algorithms.append("QuickSort")
