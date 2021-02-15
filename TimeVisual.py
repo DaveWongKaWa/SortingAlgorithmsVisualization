@@ -1,5 +1,22 @@
 import random
 import time
+import matplotlib.pyplot as plt
+import seaborn as sns
+import streamlit as st
+
+from SortingAlgorithm import QuickSort
+from SortingAlgorithm import OrdinaryTopDownMergeSort
+from SortingAlgorithm import OrdinaryBottomUpMergeSort
+from SortingAlgorithm import AltTopDownMergeSort
+from SortingAlgorithm import AltBottomUpMergeSort
+from SortingAlgorithm import InplaceTopDownMergeSort
+from SortingAlgorithm import InplaceBottomUpMergeSort
+from SortingAlgorithm import OrdinaryTopDownHeapSort
+from SortingAlgorithm import OrdinaryBottomUpHeapSort
+from SortingAlgorithm import TernaryTopDownHeapSort
+from SortingAlgorithm import TernaryBottomUpHeapSort
+from SortingAlgorithm import InsertionSort
+from SortingAlgorithm import SelectionSort
 
 #-- Generate Data ---------------------------------------------------------
 def randList(lo, hi, size):
@@ -22,24 +39,7 @@ def SortingAlgorithms_Times(func, sampleSizes, depth):
     return Times
 
 #-- Generate Plot ---------------------------------------------------------
-import matplotlib.pyplot as plt
-import seaborn as sns
 sns.set_theme(context="paper", style="darkgrid")
-import streamlit as st
-
-from SortingAlgorithm import QuickSort
-from SortingAlgorithm import OrdinaryTopDownMergeSort
-from SortingAlgorithm import OrdinaryBottomUpMergeSort
-from SortingAlgorithm import AltTopDownMergeSort
-from SortingAlgorithm import AltBottomUpMergeSort
-from SortingAlgorithm import InplaceTopDownMergeSort
-from SortingAlgorithm import InplaceBottomUpMergeSort
-from SortingAlgorithm import OrdinaryTopDownHeapSort
-from SortingAlgorithm import OrdinaryBottomUpHeapSort
-from SortingAlgorithm import TernaryTopDownHeapSort
-from SortingAlgorithm import TernaryBottomUpHeapSort
-from SortingAlgorithm import InsertionSort
-from SortingAlgorithm import SelectionSort
 
 Algorithms = []
 Algorithms.append("QuickSort")
@@ -78,41 +78,49 @@ SimpleSorts = ["InsertionSort", "SelectionSort"]
 BestComparison = ["OTDMergeSort", "OBUHeapSort", "QuickSort", "SelectionSort"]
 QuadraticComparison = ["ITDMergeSort", "IBUMergeSort", "SelectionSort", "InsertionSort"]
 
-numPlots = 1
-sizes = []
+PlotMap = dict({
+    "MergeSorts":MergeSorts,
+    "HeapSorts":HeapSorts,
+    "SimpleSorts":SimpleSorts,
+    "BestComparison":BestComparison,
+    "QuadraticComparison":QuadraticComparison
+})
 
+numPlots = 1
+plots = []
+names = []
+sizes = []
+depths = []
 def addplot(numPlots):
     newPlot = st.checkbox("Plot " + str(numPlots), False)
     if (newPlot):
         funcs = []
-        plotName = st.selectbox("Default or Custom Plot", ["MergeSorts", "HeapSorts", "SimpleSorts", "BestComparison", "QuadraticComparison", "Custom"], key=str(numPlots))
-        if (plotName == "MergeSorts"):
-            funcs = MergeSorts
-        elif (plotName == "HeapSorts"):
-            funcs = HeapSorts
-        elif (plotName == "SimpleSorts"):
-            funcs = SimpleSorts
-        elif (plotName == "BestComparison"):
-            funcs = BestComparison
-        elif (plotName == "QuadraticComparison"):
-            funcs = QuadraticComparison
-        elif (plotName == "Custom"):
-            funcs = st.multiselect("Algorithms", Algorithms)
+        col1, col2 = st.beta_columns(2)
+        plotContent = col1.selectbox("Default or Custom Plot", ["MergeSorts", "HeapSorts", "SimpleSorts", "BestComparison", "QuadraticComparison", "Custom"], key=str(numPlots))
+        plotName = col2.text_input("Name", value = "Plot " + str(numPlots))
+        names.append(plotName)
+        if (plotContent != "Custom"):
+            plots.append(PlotMap[plotContent])
+        elif (plotContent == "Custom"):
+            plots.append(st.multiselect("Algorithms", Algorithms, key=str(numPlots)))
         sampleSizeUpperBound = st.slider("Sample Sizes", min_value = 10, max_value = 1000, key=str(numPlots))
-        sizes = range(1, sampleSizeUpperBound+1)
-        depth = st.slider("Execution Depth", min_value = 1, max_value = 5, key=str(numPlots))
-        plot(funcs, sizes, depth)
+        sizes.append(range(1, sampleSizeUpperBound+1))
+        depths.append(st.slider("Execution Depth", min_value = 1, max_value = 10, key=str(numPlots)))
         numPlots += 1
-        addplot(numPlots)
+        if (numPlots <= 9):
+            addplot(numPlots)
 
-def plot(Functions, sampleSizes, depth):
-    ax = fig.add_subplot(3, 3, numPlots)
-    ax.set_title("Plot " + str(numPlots))
-    for func in Functions:
-        times = SortingAlgorithms_Times(FuncMap[func], sampleSizes, depth)
-        sns.lineplot(x = sampleSizes, y = times, linewidth=0.25, label=func)
-    plt.show()
-
-fig = plt.figure(figsize = (10, 9), dpi=500, tight_layout = True)
-plt.show()
 addplot(numPlots)
+execute = st.checkbox("Execute ", False)
+if (execute == True):
+    fig = plt.figure(figsize = (10, 9), dpi=200, tight_layout=True)
+    for i in range(0, len(plots)):
+        pos = i+1
+        ax = fig.add_subplot(3, 3, pos)
+        ax.set_title(names[i])
+        for func in plots[i]:
+            times = SortingAlgorithms_Times(FuncMap[func], sizes[i], depths[i])
+            sns.lineplot(x = sizes[i], y = times, linewidth=0.25, label=func)
+    st.pyplot(fig=fig, dpi=500)
+
+
