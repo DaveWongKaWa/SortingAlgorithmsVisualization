@@ -92,7 +92,7 @@ names = []
 sizes = []
 depths = []
 def addplot(numPlots):
-    newPlot = st.checkbox("New Plot"), False)
+    newPlot = st.checkbox("New Plot", False)
     if (newPlot):
         funcs = []
         col1, col2 = st.beta_columns(2)
