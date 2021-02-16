@@ -1,5 +1,6 @@
 import random
 import time
+import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import streamlit as st
@@ -25,7 +26,21 @@ def randList(lo, hi, size):
         randomList.append(random.randint(lo, hi))
     return randomList
 
-def SortingAlgorithms_Times(func, sampleSizes, depth):
+@st.cache
+def StaticSortingAlgorithms_Times(func, sampleSizes, depth):
+    Times = []
+    for i in sampleSizes:
+        avg = 0
+        for j in range(0, depth):
+            sampleList = randList(1, i, i)
+            start_time = time.time()
+            func(sampleList)
+            end_time = time.time()
+            avg += end_time-start_time
+        Times.append(avg/depth)
+    return Times
+
+def DynamicSortingAlgorithms_Times(func, sampleSizes, depth):
     Times = []
     for i in sampleSizes:
         avg = 0
@@ -39,8 +54,6 @@ def SortingAlgorithms_Times(func, sampleSizes, depth):
     return Times
 
 #-- Generate Plot ---------------------------------------------------------
-sns.set_theme(context="paper", style="darkgrid")
-
 Algorithms = []
 Algorithms.append("QuickSort")
 Algorithms.append("OTDMergeSort")
@@ -86,41 +99,92 @@ PlotMap = dict({
     "QuadraticComparison":QuadraticComparison
 })
 
-numPlots = 1
-plots = []
-names = []
-sizes = []
-depths = []
-def addplot(numPlots):
-    newPlot = st.checkbox("New Plot", False, key=str(numPlots))
-    if (newPlot):
-        funcs = []
-        col1, col2 = st.beta_columns(2)
-        plotContent = col1.selectbox("Default or Custom Plot", ["MergeSorts", "HeapSorts", "SimpleSorts", "BestComparison", "QuadraticComparison", "Custom"], key=str(numPlots))
-        plotName = col2.text_input("Name", value = "Plot " + str(numPlots))
-        names.append(plotName)
-        if (plotContent != "Custom"):
-            plots.append(PlotMap[plotContent])
-        elif (plotContent == "Custom"):
-            plots.append(st.multiselect("Algorithms", Algorithms, key=str(numPlots)))
-        sampleSizeUpperBound = st.slider("Sample Sizes", min_value = 10, max_value = 1000, key=str(numPlots))
-        sizes.append(range(1, sampleSizeUpperBound+1))
-        depths.append(st.slider("Execution Depth", min_value = 1, max_value = 10, key=str(numPlots)))
-        numPlots += 1
-        if (numPlots <= 9):
-            addplot(numPlots)
+ExistingPlot = 0
 
-addplot(numPlots)
-execute = st.checkbox("Execute ", False)
-if (execute == True):
-    fig = plt.figure(figsize = (10, 9), dpi=200, tight_layout=True)
-    for i in range(0, len(plots)):
-        pos = i+1
-        ax = fig.add_subplot(3, 3, pos)
-        ax.set_title(names[i])
-        for func in plots[i]:
-            times = SortingAlgorithms_Times(FuncMap[func], sizes[i], depths[i])
-            sns.lineplot(x = sizes[i], y = times, linewidth=0.25, label=func)
-    st.pyplot(fig=fig, dpi=500)
+Title = st.sidebar.text_input("Title")
+PlotSize = st.sidebar.selectbox("Square Matrix Size", [1, 4, 9], index=2)
+sns.set_theme(context="paper", style="darkgrid", font_scale=(1/np.cbrt(PlotSize))*2.3)
+#----------------------------------------------------------------------------------------------------------
+fig = plt.figure(figsize = (12, 10), dpi=200)
+fig.suptitle(Title, fontsize=(1/np.cbrt(PlotSize))*23)
+MatrixLength = int(np.sqrt(PlotSize))
+AxesContainer = []
+for i in range(0, PlotSize):
+    pos = i+1
+    AxesContainer.append(fig.add_subplot(MatrixLength, MatrixLength, pos))
 
+#----------------------------------------------------------------------------------------------------------
+class StaticPlot:
+    def __init__(self, PlotName, Functions, SampleSizes, ExecutionDepth, Position):
+        self.name = PlotName # String
+        self.funcs = Functions # [String]
+        self.sizes = SampleSizes # [int]
+        self.dp = ExecutionDepth # int
+        self.pos = Position # int
+
+    def add_to(self):
+        current = AxesContainer[self.pos - 1]
+        current.set_title(self.name)
+        plt.sca(current)
+        for func in self.funcs:
+            times = StaticSortingAlgorithms_Times(FuncMap[func], self.sizes, self.dp)
+            sns.lineplot(x = self.sizes, y = times, linewidth=0.25, label=func)
+
+def add_StaticPlot(PlotName, Functions, SampleSizes, ExecutionDepth, Position):
+    new_plot = StaticPlot(PlotName, Functions, SampleSizes, ExecutionDepth, Position)
+    new_plot.add_to()
+
+class DynamicPlot:
+    def __init__(self, PlotName, Functions, SampleSizes, ExecutionDepth, Position):
+        self.name = PlotName # String
+        self.funcs = Functions # [String]
+        self.sizes = SampleSizes # [int]
+        self.dp = ExecutionDepth # int
+        self.pos = Position # int
+
+    def add_to(self):
+        current = AxesContainer[self.pos - 1]
+        current.set_title(self.name)
+        plt.sca(current)
+        for func in self.funcs:
+            times = DynamicSortingAlgorithms_Times(FuncMap[func], self.sizes, self.dp)
+            sns.lineplot(x = self.sizes, y = times, linewidth=0.25, label=func)
+
+def add_DynamicPlot(PlotName, Functions, SampleSizes, ExecutionDepth, Position):
+    new_plot = DynamicPlot(PlotName, Functions, SampleSizes, ExecutionDepth, Position)
+    new_plot.add_to()
+
+#----------------------------------------------------------------------------------------------------------
+def Interface(position):
+    key = str(position)
+
+    col1, col2 = st.sidebar.beta_columns(2)
+    plotName = col1.text_input("Name", value="Plot " + str(key), key=key)
+    state = col2.selectbox("State", ["Static", "Dynamic"], index=0, key=key)
+
+    plotContent = st.sidebar.selectbox("Default or Custom Plot", ["MergeSorts", "HeapSorts", "SimpleSorts", "BestComparison", "QuadraticComparison", "Custom"], key=key)
+    functions = PlotMap[plotContent] if (plotContent != "Custom") else st.sidebar.multiselect("Algorithms", Algorithms, key=key)
+    
+    col3, col4 = st.sidebar.beta_columns(2)
+    sizes = range(1, col3.slider("Sample Sizes", min_value = 10, max_value = 1000, key=key)+1)
+    depth = col4.slider("Execution Depth", min_value = 1, max_value = 30, key=key)
+
+    if (state == "Static"):
+        add_StaticPlot(plotName, functions, sizes, depth, position)
+    else:
+        add_DynamicPlot(plotName, functions, sizes, depth, position)
+
+#----------------------------------------------------------------------------------------------------------
+Compatible = ExistingPlot < PlotSize
+add_new_plot = st.sidebar.checkbox("Add Plot", value=False, key=ExistingPlot)
+
+while (add_new_plot):
+    position = ExistingPlot+1
+    Interface(position)
+    ExistingPlot += 1
+    if (Compatible == False):
+        break
+    add_new_plot = st.sidebar.checkbox("Add Plot", value=False, key=ExistingPlot)
+
+st.pyplot(fig=fig, figsize=(12, 10), dpi=500)
 
